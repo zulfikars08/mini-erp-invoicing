@@ -199,3 +199,110 @@ npm run build
 - Add Docker Compose for PostgreSQL/backend/frontend.
 - Add RBAC policy per endpoint.
 - Add PDF invoice export.
+
+
+## CI/CD
+
+GitHub Actions validates the project on every push and pull request to `main`.
+
+- Backend CI runs `npm ci`, Prisma generate, and NestJS build.
+- Frontend CI runs `npm ci` and Next.js build.
+- No database migrations or seed commands run in CI.
+- Vercel handles frontend auto deployment after GitHub push.
+- Render handles backend auto deployment after GitHub push.
+- Neon hosts production PostgreSQL.
+
+Backend Render env:
+
+```env
+DATABASE_URL=postgresql://USER:***@HOST.neon.tech/DB_NAME?sslmode=require
+JWT_SECRET=change-me-to-a-long-random-secret
+JWT_EXPIRES_IN=1d
+FRONTEND_URL=https://your-vercel-url.vercel.app
+NODE_ENV=production
+```
+
+Frontend Vercel env:
+
+```env
+NEXT_PUBLIC_API_URL=https://your-render-backend-url.onrender.com/api
+```
+
+## Free Online Deployment
+
+Recommended free stack:
+
+- Frontend: Vercel Hobby / Free
+- Backend: Render Free Web Service
+- Database: Neon Free Postgres
+
+### Backend environment variables on Render
+
+```env
+DATABASE_URL=postgresql://USER:PASSWORD@HOST.neon.tech/DB_NAME?sslmode=require
+JWT_SECRET=change-me-to-a-long-random-secret
+JWT_EXPIRES_IN=1d
+PORT=10000
+FRONTEND_URL=https://your-vercel-app.vercel.app
+NODE_ENV=production
+```
+
+`FRONTEND_URL` may contain comma-separated origins if needed. Do not use `*` with credentials enabled.
+
+### Frontend environment variables on Vercel
+
+```env
+NEXT_PUBLIC_API_URL=https://your-render-backend.onrender.com/api
+```
+
+### Render backend settings
+
+Build Command:
+
+```bash
+npm install && npm run prisma:generate && npm run build
+```
+
+Start Command:
+
+```bash
+npm run prisma:deploy && npm run start:prod
+```
+
+Health check:
+
+```txt
+https://your-render-backend.onrender.com/api/health
+```
+
+Swagger:
+
+```txt
+https://your-render-backend.onrender.com/api/docs
+```
+
+### Deployment steps
+
+1. Create a Neon PostgreSQL database.
+2. Copy Neon `DATABASE_URL` with `sslmode=require`.
+3. Deploy `backend/` to Render as a Web Service.
+4. Add Render environment variables.
+5. Deploy `frontend/` to Vercel.
+6. Add Vercel `NEXT_PUBLIC_API_URL`.
+7. Update Render `FRONTEND_URL` with the Vercel URL.
+8. Redeploy backend.
+9. Test login and app flow online.
+10. Verify `/api/health` and `/api/docs`.
+
+### Online QA checklist
+
+- Backend health endpoint returns `{ "status": "ok" }`.
+- Swagger opens.
+- Vercel frontend opens.
+- Login works online.
+- Create customer works.
+- Create invoice works.
+- Update invoice status works.
+- Dashboard updates.
+- Invoice history works.
+
