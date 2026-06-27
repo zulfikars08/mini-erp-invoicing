@@ -1,3 +1,3 @@
-export function Loading() { return <p className="p-6 text-sm text-slate-500">Loading...</p>; }
-export function Empty({ text='No data' }: { text?: string }) { return <p className="rounded-xl border border-dashed p-6 text-center text-sm text-slate-500">{text}</p>; }
-export function ErrorMessage({ error }: { error: string }) { return <p className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>; }
+export function Loading() { return <div className="rounded-xl border border-slate-200 bg-white p-8 text-center text-sm text-slate-500 shadow-sm">Loading data...</div>; }
+export function Empty({ text='No data' }: { text?: string }) { return <div className="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center"><p className="font-medium text-slate-900">{text}</p><p className="mt-1 text-sm text-slate-500">Once data exists, it will appear here.</p></div>; }
+export function ErrorMessage({ error }: { error: string }) { return <p className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">{error}</p>; }

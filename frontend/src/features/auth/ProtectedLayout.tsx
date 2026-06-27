@@ -1,14 +1,14 @@
 'use client';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ReactNode, useEffect, useState } from 'react';
 import { clearSession, getToken, getUser } from '@/lib/auth';
 import { useToast } from '@/hooks/useToast';
 
 const nav = [['Dashboard','/dashboard'],['Customers','/customers'],['Invoices','/invoices'],['History','/invoices/history']];
 export function ProtectedLayout({ children }: { children: ReactNode }) {
-  const router = useRouter(); const toast=useToast(); const [ready,setReady]=useState(false); const user=getUser();
+  const router = useRouter(); const pathname=usePathname(); const toast=useToast(); const [ready,setReady]=useState(false); const user=getUser();
   useEffect(()=>{ if(!getToken()) router.replace('/login'); else setReady(true); },[router]);
   if(!ready) return <main className="p-6 text-sm text-slate-500">Loading...</main>;
-  return <div className="min-h-screen bg-slate-50"><aside className="fixed inset-x-0 top-0 z-10 border-b bg-white"><div className="mx-auto flex max-w-6xl items-center justify-between p-4"><Link href="/dashboard" className="font-bold">Mini ERP</Link><nav className="hidden gap-4 md:flex">{nav.map(([n,h])=><Link key={h} href={h} className="text-sm text-slate-600 hover:text-slate-950">{n}</Link>)}</nav><div className="flex items-center gap-3"><span className="hidden text-xs text-slate-500 sm:block">{user?.email}</span><button className="text-sm font-semibold" onClick={()=>{clearSession(); toast({variant:'success',title:'Signed out successfully.'}); router.replace('/login')}}>Logout</button></div></div></aside><main className="mx-auto max-w-6xl px-4 pb-10 pt-24">{children}</main></div>;
+  return <div className="min-h-screen bg-slate-50"><aside className="sticky top-0 z-20 border-b border-slate-200 bg-white/90 shadow-sm backdrop-blur"><div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6"><Link href="/dashboard" className="flex items-center gap-2 font-semibold text-slate-950"><span className="grid h-9 w-9 place-items-center rounded-xl bg-indigo-600 text-sm font-bold text-white shadow-sm">ME</span><span>Mini ERP</span></Link><nav className="hidden items-center gap-1 md:flex">{nav.map(([n,h])=>{const active=pathname===h || (h==='/invoices'&&pathname.startsWith('/invoices')&&pathname!=='/invoices/history'); return <Link key={h} href={h} className={`rounded-lg px-3 py-2 text-sm font-medium transition ${active?'bg-indigo-50 text-indigo-700':'text-slate-600 hover:bg-slate-100 hover:text-slate-950'}`}>{n}</Link>})}</nav><div className="flex items-center gap-3"><span className="hidden rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600 sm:block">{user?.email}</span><button className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50" onClick={()=>{clearSession(); toast({variant:'success',title:'Signed out successfully.'}); router.replace('/login')}}>Logout</button></div></div><nav className="mx-auto flex max-w-7xl gap-1 overflow-x-auto px-4 pb-3 md:hidden">{nav.map(([n,h])=><Link key={h} href={h} className={`rounded-lg px-3 py-2 text-sm font-medium ${pathname===h?'bg-indigo-50 text-indigo-700':'text-slate-600'}`}>{n}</Link>)}</nav></aside><main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:py-8">{children}</main></div>;
 }
